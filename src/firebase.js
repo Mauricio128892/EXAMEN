@@ -1,22 +1,22 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth"; 
-import { getFirestore } from "firebase/firestore"; 
+    // src/firebase.js
+    import { initializeApp } from "firebase/app";
+    import { getFirestore } from "firebase/firestore"; // Importa Firestore
+    import { getAuth } from "firebase/auth";       // Importa Auth
 
+    // Tu configuración de Firebase, leyendo desde las variables de entorno
+    const firebaseConfig = {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: import.meta.env.VITE_FIREBASE_APP_ID
+    };
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBP19uhA7jCVOy1P1qAgh7Hb68XYK33Glg",
-  authDomain: "recusosh-fede5.firebaseapp.com",
-  projectId: "recusosh-fede5",
-  storageBucket: "recusosh-fede5.firebasestorage.app",
-  messagingSenderId: "54809295735",
-  appId: "1:54809295735:web:3bd8528f9a15a35e6fff72",
-  measurementId: "G-P9T0SRHGME" 
-};
+    // Inicializa Firebase
+    const app = initializeApp(firebaseConfig);
 
-
-const app = initializeApp(firebaseConfig);
-
-export const auth = getAuth(app); 
-export const provider = new GoogleAuthProvider(); 
-export const db = getFirestore(app); 
-
+    // Exporta los servicios de Firebase que usarás
+    export const db = getFirestore(app);
+    export const auth = getAuth(app);
+    

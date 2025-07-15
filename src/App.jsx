@@ -1,107 +1,59 @@
-
+// src/App.jsx
 import React from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext'; 
-import { auth } from './firebase'; 
-import { signOut } from 'firebase/auth'; 
+import { Routes, Route } from 'react-router-dom'; // Solo Routes y Route
 
+// Importa el proveedor de autenticación y el componente de ruta protegida
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 
-import Navbar from './components/Navbar'; 
-import Login from './components/Login'; 
-import Employees from './components/Employees'; 
-import Perfil from './components/perfil'; 
+// Importa los componentes de diseño
+import Navbar from './components/Layout/Navbar';
+import Footer from './components/Layout/Footer';
 
-
-const HomePage = () => (
-  <div className="p-4">
-    <h1 className="text-3xl font-bold mb-4">Bienvenido a mi página de RH</h1>
-    <p className="text-gray-700">Explora las secciones de tu sistema de Recursos Humanos.</p>
-  </div>
-);
-
-
-const PrivateRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-
-  if (loading) {
-   
-    return (
-      <div className="flex items-center justify-center min-h-screen text-xl font-semibold text-gray-700">
-        Cargando...
-      </div>
-    );
-  }
-
-  if (!user) {
-
-    React.useEffect(() => {
-      navigate('/login');
-    }, [navigate]);
-    return null; 
-  }
-
-
-  return children;
-};
+// Importa todas las páginas
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
+import RecipesPage from './pages/RecipesPage';
+import CreateRecipePage from './pages/CreateRecipePage';
+import RecipeDetailPage from './pages/RecipeDetailPage';
+import EditRecipePage from './pages/EditRecipePage';
+// import ProfilePage from './pages/ProfilePage'; // Asegúrate de que esta línea esté COMENTADA o ELIMINADA
 
 
 function App() {
-  const { user } = useAuth(); 
-  const navigate = useNavigate(); 
-
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth); 
-      navigate('/login'); 
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error.message);
-    
-      alert("Error al cerrar sesión: " + error.message); 
-    }
-  };
-
   return (
-    <>
+    // No hay <Router> aquí, ya está en main.jsx
+    <div className="min-h-screen bg-primaryBg flex flex-col">
+      <Navbar />
 
-      {user && <Navbar onSignOut={handleSignOut} />}
+      <main className="flex-grow">
+        <Routes>
+          {/* Rutas Públicas */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
 
+          {/* Rutas Protegidas */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/recetas" element={<RecipesPage />} />
+            <Route path="/recetas/crear" element={<CreateRecipePage />} />
+            <Route path="/recetas/:id" element={<RecipeDetailPage />} />
+            <Route path="/recetas/editar/:id" element={<EditRecipePage />} />
+            {/* <Route path="/perfil" element={<ProfilePage />} /> */} {/* Asegúrate de que esta línea esté COMENTADA o ELIMINADA */}
+          </Route>
 
-      <Routes>
+          {/* Ruta 404 */}
+          <Route path="*" element={
+            <div className="flex justify-center items-center h-full text-center">
+              <h1 className="text-textColor text-4xl font-bold">404: Página No Encontrada</h1>
+            </div>
+          } />
+        </Routes>
+      </main>
 
-        <Route path="/login" element={<Login />} />
-
-
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <HomePage /> 
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/empleados"
-          element={
-            <PrivateRoute>
-              <Employees /> 
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/perfil"
-          element={
-            <PrivateRoute>
-              <Perfil /> 
-            </PrivateRoute>
-          }
-        />
-
-        
-        <Route path="*" element={<h1 className="text-4xl text-center mt-20">404 - Página no encontrada</h1>} />
-      </Routes>
-    </>
+      <Footer />
+    </div>
   );
 }
 
