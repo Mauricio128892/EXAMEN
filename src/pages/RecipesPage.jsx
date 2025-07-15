@@ -1,16 +1,17 @@
 // src/pages/RecipesPage.jsx
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase'; // Importa la instancia de Firestore
-import { collection, query, orderBy, getDocs } from 'firebase/firestore'; // Importa funciones para obtener documentos
+import { db } from '../firebase';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import RecipeCard from '../components/Recipes/RecipeCard';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
-import { useAuth } from '../contexts/AuthContext'; // Si quieres filtrar por usuario logueado
+import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom'; // <--- ¡AÑADE ESTA LÍNEA!
 
 const RecipesPage = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser } = useAuth(); // Para filtrar si solo quieres las recetas del usuario
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -18,10 +19,7 @@ const RecipesPage = () => {
       setError(null);
       try {
         const recipesCollectionRef = collection(db, 'recipes');
-        // Opcional: Si solo quieres las recetas del usuario logueado:
-        // const q = query(recipesCollectionRef, where("userId", "==", currentUser.uid), orderBy("fechaCreacion", "desc"));
-        // Si quieres todas las recetas:
-        const q = query(recipesCollectionRef, orderBy("fechaCreacion", "desc")); // Ordenar por fecha de creación
+        const q = query(recipesCollectionRef, orderBy("fechaCreacion", "desc"));
 
         const querySnapshot = await getDocs(q);
         const recipesList = querySnapshot.docs.map(doc => ({
@@ -37,8 +35,10 @@ const RecipesPage = () => {
       }
     };
 
+    // Esto asegura que las recetas se recarguen si el usuario cambia (ej. login/logout)
+    // o si es la primera carga.
     fetchRecipes();
-  }, [currentUser]); // Dependencia: si cambias el filtro por usuario, que se recarguen
+  }, [currentUser]);
 
   if (loading) {
     return <LoadingSpinner />;
